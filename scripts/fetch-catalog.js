@@ -23,7 +23,8 @@ const path = require("path");
 // ── Load settings ──────────────────────────────────────────────────────────
 // Tiny inline require that avoids a module system mismatch with the browser
 // settings.js (which assigns to a global). We read it as text and eval.
-const settingsPath = path.resolve(__dirname, "../settings.js");
+// Settings lives in src/ so it loads correctly from index.html when served from src/
+const settingsPath = path.resolve(__dirname, "../src/settings.js");
 const settingsCode = fs.readFileSync(settingsPath, "utf8");
 // Provide a mock global so the file can assign to `const SETTINGS`
 let SETTINGS;
@@ -76,13 +77,15 @@ function parseCsv(text) {
   return rows;
 }
 
-// ── Drive URL → direct image URL ───────────────────────────────────────────
+// ── Drive URL → direct embeddable image URL ────────────────────────────────
+// lh3.googleusercontent.com/d/ID returns the image with CORS *, unlike
+// uc?export=view which returns a 303 redirect that breaks <img> tags.
 function normalizeDriveUrl(url) {
   if (!url) return "";
   const m = url.match(/\/file\/d\/([-\w]+)/);
-  if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+  if (m) return `https://lh3.googleusercontent.com/d/${m[1]}`;
   const m2 = url.match(/[?&]id=([-\w]+)/);
-  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+  if (m2) return `https://lh3.googleusercontent.com/d/${m2[1]}`;
   return url;
 }
 

@@ -26,13 +26,15 @@
       .replace(/"/g, "&quot;");
   }
 
-  // Convert Google Drive share link → direct viewable URL
+  // Convert Google Drive share link → direct embeddable URL.
+  // lh3.googleusercontent.com/d/ID returns the image directly (200 + CORS *),
+  // unlike uc?export=view which only returns a 303 redirect that breaks <img>.
   function normalizeImage(url) {
     if (!url) return "";
     const m1 = url.match(/\/file\/d\/([-\w]+)/);
-    if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+    if (m1) return `https://lh3.googleusercontent.com/d/${m1[1]}`;
     const m2 = url.match(/[?&]id=([-\w]+)/);
-    if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+    if (m2) return `https://lh3.googleusercontent.com/d/${m2[1]}`;
     return url;
   }
 
@@ -66,17 +68,20 @@
     { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
   );
 
+  // 1×1 transparent SVG — prevents broken-image icon while real src is pending
+  const BLANK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
+
   // ── Build card HTML ───────────────────────────────────────────────────────
 
   function buildCard(product, index) {
     const isFlipped = index % 2 === 1;
     const imgUrl = normalizeImage(product.imageUrl);
 
+    // No loading="lazy" — we drive that ourselves via IntersectionObserver
     const imageHtml = imgUrl
       ? `<img data-src="${escHtml(imgUrl)}"
-              src=""
+              src="${BLANK}"
               alt="${escHtml(product.name)}"
-              loading="lazy"
               width="600" height="400">`
       : `<div class="product-image-placeholder">🌸</div>`;
 
@@ -97,10 +102,14 @@
           </div>`
         : "";
 
-    const displayPrice =
+    // rawPrice is the plain number string from the spreadsheet ("10000").
+    // displayPrice is the formatted string for the UI ("$ 10.000").
+    // data-price always stores rawPrice so cartTotal can parse it correctly.
+    const rawPrice =
       product.variants && product.variants.length
-        ? formatPrice(product.variants[0].price) || formatPrice(product.price)
-        : formatPrice(product.price);
+        ? product.variants[0].price || product.price
+        : product.price;
+    const displayPrice = formatPrice(rawPrice);
 
     return `
       <article class="product-card${isFlipped ? " flipped" : ""}"
@@ -122,7 +131,7 @@
             <button class="btn btn-primary add-to-cart"
                     data-id="${product.id}"
                     data-name="${escHtml(product.name)}"
-                    data-price="${escHtml(displayPrice)}"
+                    data-price="${escHtml(rawPrice)}"
                     data-image="${escHtml(imgUrl)}">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                    fill="none" stroke="currentColor" stroke-width="2.5">

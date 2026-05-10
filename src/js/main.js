@@ -207,7 +207,9 @@
 
   function cartTotal(cart) {
     return cart.reduce((sum, item) => {
-      const n = parseFloat(String(item.price).replace(/[^\d.,]/g, "").replace(",", "."));
+      // item.price is always the raw spreadsheet value ("10000"), never the
+      // formatted display string, so a plain parseFloat is safe here.
+      const n = parseFloat(String(item.price).replace(/[^\d.]/g, ""));
       return sum + (isNaN(n) ? 0 : n * item.qty);
     }, 0);
   }
@@ -308,8 +310,8 @@
     const cart = loadCart();
     renderCartItems(cart);
 
-    // Open / close
-    qs(".cart-toggle")?.addEventListener("click", openCart);
+    // Open / close (attach to ALL .cart-toggle buttons: navbar + mobile menu)
+    qsa(".cart-toggle").forEach((btn) => btn.addEventListener("click", openCart));
     qs(".cart-close")?.addEventListener("click", closeCart);
     qs(".cart-overlay")?.addEventListener("click", closeCart);
 
@@ -463,20 +465,15 @@
       });
     }
 
-    // Click to select files
-    area.addEventListener("click", (e) => {
-      if (!e.target.closest(".upload-remove-btn") && !e.target.closest("#upload-btn")) {
-        input.click();
-      }
-    });
-
+    // The <label for="file-input"> in the HTML handles opening the picker.
+    // We only need to listen for the change event here.
     input.addEventListener("change", () => {
       pendingFiles = [...pendingFiles, ...Array.from(input.files)];
       input.value = "";
       renderFileList();
     });
 
-    // Drag-and-drop
+    // Drag-and-drop onto the label/area
     area.addEventListener("dragover", (e) => { e.preventDefault(); area.classList.add("dragover"); });
     area.addEventListener("dragleave", () => area.classList.remove("dragover"));
     area.addEventListener("drop", (e) => {
@@ -486,19 +483,22 @@
       renderFileList();
     });
 
-    // Upload button
+    // Upload button — starts Drive upload (files must already be selected)
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async (e) => {
         e.stopPropagation();
+        e.preventDefault(); // prevent label from re-opening picker
 
         if (!pendingFiles.length) {
-          setStatus("Seleccioná al menos un archivo.", "error");
+          setStatus("Primero seleccioná archivos haciendo clic en el área de arriba.", "error");
           return;
         }
 
         const clientId = S.googleClientId;
         if (!clientId || clientId.includes("YOUR_GOOGLE_CLIENT_ID")) {
-          setStatus("⚠️ googleClientId no está configurado en settings.js.", "error");
+          // Fallback: open the Drive folder so the user can upload manually
+          setStatus("⚠️ Carga automática no configurada. Abriendo carpeta de Drive…", "error");
+          setTimeout(() => window.open(`https://drive.google.com/drive/folders/${S.uploadFolderId}`, "_blank"), 1200);
           return;
         }
 

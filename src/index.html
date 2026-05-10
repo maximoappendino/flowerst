@@ -31,11 +31,23 @@
       "@type": "Product",
       "name": "10 Polaroids",
       "description": "Imprimi tus momentos",
-      "image": "https://drive.google.com/uc?export=view&id=1Yd473JByCXoNQRil7z6HOQA2--re-Zob",
+      "image": "https://lh3.googleusercontent.com/d/1Yd473JByCXoNQRil7z6HOQA2--re-Zob",
       "category": "color",
       "offers": {
         "@type": "Offer",
         "price": "10000",
+        "priceCurrency": "ARS"
+      }
+    },
+    {
+      "@type": "Product",
+      "name": "Polaroid Mini",
+      "description": "Polaroid mini 5cm x 6cm. 20 Unidades",
+      "image": "https://lh3.googleusercontent.com/d/1BHFA5iziTfm4I7Rf_QWBanm77yhbppV0",
+      "category": "color",
+      "offers": {
+        "@type": "Offer",
+        "price": "2500",
         "priceCurrency": "ARS"
       }
     }
@@ -59,7 +71,9 @@
 
     <div class="nav-section nav-center">
       <a href="#home" class="nav-logo-wrap" aria-label="Flower St — inicio">
-        <img src="../img/logo-flowerst.jpeg" alt="Flower St" class="nav-logo-img">
+        <img src="../img/logo.jpeg" alt="Flower St" class="nav-logo-img"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+        <span class="nav-logo-text" style="display:none">Flower St</span>
       </a>
     </div>
 
@@ -193,7 +207,9 @@
         Nos pondremos en contacto por WhatsApp para coordinar los detalles.
       </p>
 
-      <div class="upload-area" id="upload-area" role="region" aria-label="Área de carga de archivos">
+      <!-- The <label> wrapping the drop-zone ensures clicking anywhere in it
+           opens the OS file picker reliably across all browsers. -->
+      <label class="upload-area" id="upload-area" for="file-input">
 
         <div class="upload-area-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -204,19 +220,24 @@
           </svg>
         </div>
 
-        <p class="upload-hint">
-          Arrastrá los archivos aquí o hacé clic para seleccionarlos
-        </p>
+        <p class="upload-hint">Hacé clic aquí o arrastrá archivos para seleccionarlos</p>
 
-        <input type="file" id="file-input" multiple aria-label="Seleccionar archivos">
+        <!-- Hidden input — triggered by the <label> above -->
+        <input type="file" id="file-input" multiple
+               style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
+               tabindex="-1">
 
-        <div class="upload-file-list" id="upload-file-list"></div>
+        <!-- File list and upload button sit inside the label but stop click propagation
+             via JS so they don't re-open the picker -->
+        <div class="upload-file-list" id="upload-file-list"
+             onclick="event.preventDefault()"></div>
 
         <div class="upload-progress-bar">
           <div class="upload-progress-fill" id="upload-progress-fill"></div>
         </div>
 
-        <button class="btn btn-primary" id="upload-btn" style="margin-top:1.2rem">
+        <button class="btn btn-primary" id="upload-btn" style="margin-top:1.2rem"
+                onclick="event.preventDefault()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="16 16 12 12 8 16"/>
@@ -232,7 +253,7 @@
 
         <p class="upload-status" aria-live="polite"></p>
 
-      </div><!-- .upload-area -->
+      </label><!-- .upload-area -->
     </div>
   </section>
 
@@ -330,14 +351,23 @@
     "price": "10000",
     "category": "color",
     "description": "Imprimi tus momentos",
-    "imageUrl": "https://drive.google.com/uc?export=view&id=1Yd473JByCXoNQRil7z6HOQA2--re-Zob",
+    "imageUrl": "https://lh3.googleusercontent.com/d/1Yd473JByCXoNQRil7z6HOQA2--re-Zob",
+    "variants": []
+  },
+  {
+    "id": 2,
+    "name": "Polaroid Mini",
+    "price": "2500",
+    "category": "color",
+    "description": "Polaroid mini 5cm x 6cm. 20 Unidades",
+    "imageUrl": "https://lh3.googleusercontent.com/d/1BHFA5iziTfm4I7Rf_QWBanm77yhbppV0",
     "variants": []
   }
 ]
 </script>
 
   <!-- Scripts -->
-  <script src="../settings.js"></script>
+  <script src="settings.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/main.js"></script>
 
