@@ -14,9 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <!-- Google Identity Services (for Drive upload) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
   <!-- JSON-LD Structured Data — updated automatically by fetch-catalog.js -->
   <script id="structured-data" type="application/ld+json">
 {
@@ -65,23 +62,32 @@
   <nav class="navbar at-top" id="navbar" role="navigation" aria-label="Navegación principal">
 
     <div class="nav-section nav-left">
-      <a href="#home"   class="nav-link">Inicio</a>
+      <a href="#home"    class="nav-link">Inicio</a>
       <a href="#catalog" class="nav-link">Catálogo</a>
+      <a href="#about"   class="nav-link">Nosotros</a>
     </div>
 
     <div class="nav-section nav-center">
       <a href="#home" class="nav-logo-wrap" aria-label="Flower St — inicio">
-        <img src="../img/logo.jpeg" alt="Flower St" class="nav-logo-img"
+        <img src="img/logo.jpeg" alt="Flower St" class="nav-logo-img"
              onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
         <span class="nav-logo-text" style="display:none">Flower St</span>
       </a>
     </div>
 
     <div class="nav-section nav-right">
-      <a href="#about"  class="nav-link">Nosotros</a>
-      <a href="#upload" class="nav-link">Subir archivos</a>
+      <!-- Upload button -->
+      <button class="upload-toggle" id="upload-toggle" aria-label="Subir archivos">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span class="upload-toggle-label">Subir archivos</span>
+      </button>
+      <!-- Cart button -->
       <button class="cart-toggle" id="cart-toggle" aria-label="Abrir carrito">
-        <!-- Cart icon -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -102,7 +108,15 @@
     <a href="#home"    class="nav-link">Inicio</a>
     <a href="#catalog" class="nav-link">Catálogo</a>
     <a href="#about"   class="nav-link">Nosotros</a>
-    <a href="#upload"  class="nav-link">Subir archivos</a>
+    <button class="upload-toggle nav-link" id="upload-toggle-mobile" aria-label="Subir archivos">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Subir archivos
+    </button>
     <button class="cart-toggle" aria-label="Abrir carrito">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="2">
@@ -195,69 +209,6 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════════════
-       UPLOAD SECTION
-  ══════════════════════════════════════════════════════════════════════ -->
-  <section class="upload-section" id="upload" aria-label="Subir archivos">
-    <div class="upload-inner">
-
-      <h2 class="section-title">Subir archivos</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">
-        Subí tus archivos de diseño directamente a nuestra carpeta de Google Drive.<br>
-        Nos pondremos en contacto por WhatsApp para coordinar los detalles.
-      </p>
-
-      <!-- The <label> wrapping the drop-zone ensures clicking anywhere in it
-           opens the OS file picker reliably across all browsers. -->
-      <label class="upload-area" id="upload-area" for="file-input">
-
-        <div class="upload-area-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-        </div>
-
-        <p class="upload-hint">Hacé clic aquí o arrastrá archivos para seleccionarlos</p>
-
-        <!-- Hidden input — triggered by the <label> above -->
-        <input type="file" id="file-input" multiple
-               style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-               tabindex="-1">
-
-        <!-- File list and upload button sit inside the label but stop click propagation
-             via JS so they don't re-open the picker -->
-        <div class="upload-file-list" id="upload-file-list"
-             onclick="event.preventDefault()"></div>
-
-        <div class="upload-progress-bar">
-          <div class="upload-progress-fill" id="upload-progress-fill"></div>
-        </div>
-
-        <button class="btn btn-primary" id="upload-btn" style="margin-top:1.2rem"
-                onclick="event.preventDefault()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="16 16 12 12 8 16"/>
-            <line x1="12" y1="12" x2="12" y2="21"/>
-            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-          </svg>
-          Subir a Google Drive
-        </button>
-
-        <p class="upload-auth-note">
-          Se solicitará autorización de Google la primera vez.
-        </p>
-
-        <p class="upload-status" aria-live="polite"></p>
-
-      </label><!-- .upload-area -->
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════════════
        FOOTER
   ══════════════════════════════════════════════════════════════════════ -->
   <footer class="footer" id="contact">
@@ -272,7 +223,6 @@
         <a href="#home">Inicio</a>
         <a href="#catalog">Catálogo</a>
         <a href="#about">Nosotros</a>
-        <a href="#upload">Subir archivos</a>
       </nav>
 
       <div class="footer-contact">
@@ -328,6 +278,49 @@
     </div>
 
   </aside>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       UPLOAD MODAL
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="upload-overlay" aria-hidden="true"></div>
+
+  <div class="upload-modal" id="upload-modal" role="dialog"
+       aria-label="Subir archivos" aria-hidden="true">
+
+    <div class="modal-header">
+      <h3>Subir archivos</h3>
+      <button class="modal-close" id="upload-modal-close" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <p class="modal-subtitle">
+      Explorá nuestra carpeta de Drive y subí tus archivos de diseño directamente desde tu cuenta de Google.
+    </p>
+
+    <iframe
+      src="https://drive.google.com/embeddedfolderview?id=1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o#list"
+      class="drive-embed"
+      title="Carpeta de archivos Flower St"
+      allowfullscreen>
+    </iframe>
+
+    <a href="https://drive.google.com/drive/folders/1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o?usp=sharing"
+       target="_blank" rel="noopener"
+       class="btn btn-primary drive-open-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      Abrir en Google Drive
+    </a>
+
+  </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
        WHATSAPP FLOATING BUTTON

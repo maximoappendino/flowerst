@@ -15,14 +15,9 @@ const SETTINGS = {
   spreadsheetId: "1dVZQ9njepNWxefuMsPj8OvrsFuDiq5ea8rxg-TP71F0",
 
   // ── Google Drive upload ───────────────────────────────────────────────────
-  // Folder where client files will be uploaded.
+  // Folder where client files will be uploaded (shown as fallback link).
   uploadFolderId: "1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o",
 
-  // Google Cloud OAuth 2.0 Client ID for the Drive upload feature.
-  // Create at: console.cloud.google.com → APIs & Services → Credentials
-  // Enable: Google Drive API
-  // Authorized JS origins: add your domain (and http://localhost for local dev)
-  googleClientId: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
 
   // ── Hero Carousel ─────────────────────────────────────────────────────────
   // Each slide: { image, title, subtitle }

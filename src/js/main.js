@@ -33,12 +33,6 @@
     return "$ " + n.toLocaleString("es-AR");
   }
 
-  function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  }
-
   /* ── Apply settings to page ──────────────────────────────────────────── */
 
   function applySettings() {
@@ -410,178 +404,27 @@
     });
   }
 
-  /* ── Google Drive file upload ─────────────────────────────────────────── */
-
-  let gisClient = null;
-  let accessToken = null;
-  let pendingFiles = [];
+  /* ── Upload modal (embedded Drive folder) ───────────────────────────────── */
 
   function initUpload() {
-    const area     = qs(".upload-area");
-    const input    = qs("#file-input");
-    const fileList = qs(".upload-file-list");
-    const uploadBtn = qs("#upload-btn");
-    const progressBar  = qs(".upload-progress-fill");
-    const progressWrap = qs(".upload-progress-bar");
-    const statusEl = qs(".upload-status");
+    if (!qs(".upload-modal")) return;
 
-    if (!area) return;
-
-    function setStatus(msg, type = "") {
-      if (!statusEl) return;
-      statusEl.textContent = msg;
-      statusEl.className = "upload-status" + (type ? ` ${type}` : "");
+    function open() {
+      qs(".modal-overlay")?.classList.add("open");
+      qs(".upload-modal")?.classList.add("open");
+      document.body.style.overflow = "hidden";
     }
 
-    function renderFileList() {
-      if (!fileList) return;
-      if (!pendingFiles.length) { fileList.innerHTML = ""; return; }
-      fileList.innerHTML = pendingFiles
-        .map(
-          (f, i) => `
-          <div class="upload-file-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-              <polyline points="13 2 13 9 20 9"/>
-            </svg>
-            <span class="upload-file-name">${f.name}</span>
-            <span class="upload-file-size">${formatBytes(f.size)}</span>
-            <button class="upload-remove-btn" data-index="${i}" aria-label="Quitar">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 6 6 18M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>`
-        )
-        .join("");
-
-      fileList.querySelectorAll(".upload-remove-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          pendingFiles.splice(Number(btn.dataset.index), 1);
-          renderFileList();
-        });
-      });
+    function close() {
+      qs(".modal-overlay")?.classList.remove("open");
+      qs(".upload-modal")?.classList.remove("open");
+      document.body.style.overflow = "";
+      qs(".mobile-menu")?.classList.remove("open");
     }
 
-    // The <label for="file-input"> in the HTML handles opening the picker.
-    // We only need to listen for the change event here.
-    input.addEventListener("change", () => {
-      pendingFiles = [...pendingFiles, ...Array.from(input.files)];
-      input.value = "";
-      renderFileList();
-    });
-
-    // Drag-and-drop onto the label/area
-    area.addEventListener("dragover", (e) => { e.preventDefault(); area.classList.add("dragover"); });
-    area.addEventListener("dragleave", () => area.classList.remove("dragover"));
-    area.addEventListener("drop", (e) => {
-      e.preventDefault();
-      area.classList.remove("dragover");
-      pendingFiles = [...pendingFiles, ...Array.from(e.dataTransfer.files)];
-      renderFileList();
-    });
-
-    // Upload button — starts Drive upload (files must already be selected)
-    if (uploadBtn) {
-      uploadBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        e.preventDefault(); // prevent label from re-opening picker
-
-        if (!pendingFiles.length) {
-          setStatus("Primero seleccioná archivos haciendo clic en el área de arriba.", "error");
-          return;
-        }
-
-        const clientId = S.googleClientId;
-        if (!clientId || clientId.includes("YOUR_GOOGLE_CLIENT_ID")) {
-          // Fallback: open the Drive folder so the user can upload manually
-          setStatus("⚠️ Carga automática no configurada. Abriendo carpeta de Drive…", "error");
-          setTimeout(() => window.open(`https://drive.google.com/drive/folders/${S.uploadFolderId}`, "_blank"), 1200);
-          return;
-        }
-
-        setStatus("Autenticando con Google…");
-        uploadBtn.disabled = true;
-
-        try {
-          accessToken = await getGoogleToken(clientId);
-        } catch {
-          setStatus("❌ Autenticación cancelada o fallida.", "error");
-          uploadBtn.disabled = false;
-          return;
-        }
-
-        const total = pendingFiles.length;
-        let done = 0;
-
-        if (progressWrap) progressWrap.style.display = "block";
-
-        for (const file of pendingFiles) {
-          setStatus(`Subiendo ${file.name}…`);
-          try {
-            await uploadFileToDrive(file, S.uploadFolderId, accessToken);
-            done++;
-            if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
-          } catch (err) {
-            console.error("[upload]", err);
-            setStatus(`❌ Error al subir ${file.name}: ${err.message}`, "error");
-            uploadBtn.disabled = false;
-            return;
-          }
-        }
-
-        pendingFiles = [];
-        renderFileList();
-        setStatus(`✅ ${total} archivo${total > 1 ? "s" : ""} subido${total > 1 ? "s" : ""} correctamente!`, "success");
-        uploadBtn.disabled = false;
-        if (progressBar) setTimeout(() => { progressBar.style.width = "0%"; if (progressWrap) progressWrap.style.display = "none"; }, 2000);
-      });
-    }
-  }
-
-  function getGoogleToken(clientId) {
-    return new Promise((resolve, reject) => {
-      if (accessToken) return resolve(accessToken);
-
-      if (typeof google === "undefined" || !google.accounts) {
-        reject(new Error("Google Identity Services not loaded"));
-        return;
-      }
-
-      const client = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: "https://www.googleapis.com/auth/drive.file",
-        callback: (resp) => {
-          if (resp.error) { reject(new Error(resp.error)); return; }
-          accessToken = resp.access_token;
-          resolve(accessToken);
-        },
-      });
-
-      client.requestAccessToken({ prompt: "consent" });
-    });
-  }
-
-  async function uploadFileToDrive(file, folderId, token) {
-    const metadata = { name: file.name, parents: folderId ? [folderId] : [] };
-
-    const form = new FormData();
-    form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
-    form.append("file", file);
-
-    const res = await fetch(
-      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name",
-      { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form }
-    );
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
-    }
-
-    return res.json();
+    qsa(".upload-toggle").forEach((btn) => btn.addEventListener("click", open));
+    qs(".modal-overlay")?.addEventListener("click", close);
+    qs("#upload-modal-close")?.addEventListener("click", close);
   }
 
   /* ── Boot ─────────────────────────────────────────────────────────────── */

@@ -10,16 +10,16 @@ A static e-commerce site for a print shop. The product catalog syncs automatical
 flowerst/
 ├── src/
 │   ├── index.html          ← main page (deploy this folder)
+│   ├── settings.js         ← ★ ALL configuration lives here
 │   ├── css/style.css
+│   ├── img/                ← local images (logo, about photo, etc.)
 │   └── js/
 │       ├── catalog.js      ← product rendering & lazy-loading
 │       └── main.js         ← carousel, cart, WhatsApp, file upload
-├── img/                    ← local images (logo, about photo, etc.)
 ├── scripts/
 │   └── fetch-catalog.js    ← build script: fetches CSV → patches index.html
 ├── .github/workflows/
 │   └── sync-catalog.yml    ← GitHub Action: runs fetch-catalog daily
-├── settings.js             ← ★ ALL configuration lives here
 ├── package.json
 └── README.md
 ```
@@ -48,8 +48,7 @@ Open `settings.js` and fill in every field:
 | `storeEmail` | Contact email shown in footer |
 | `whatsappPhone` | WhatsApp number with country code, e.g. `+541112345678` |
 | `spreadsheetId` | Google Sheets ID from the URL |
-| `uploadFolderId` | Google Drive folder ID for client file uploads |
-| `googleClientId` | OAuth 2.0 Client ID (see Drive upload setup below) |
+| `uploadFolderId` | Google Drive folder ID embedded in the upload modal |
 | `carouselSlides` | Array of `{ image, title, subtitle }` for the hero carousel |
 | `infoBlocks` | Feature cards below the carousel |
 | `aboutText` | About section body text |
@@ -97,20 +96,15 @@ You can also trigger it manually from **Actions → Sync Catalog → Run workflo
 
 ## File upload to Google Drive
 
-The "Subir archivos" section lets visitors upload files directly to the configured Drive folder. This uses **Google OAuth 2.0** in the browser — no backend required.
+The "Subir archivos" button in the navbar opens a modal with your Google Drive folder **embedded directly** as an iframe. Visitors can browse the folder and click **Abrir en Google Drive** to upload files from their own Google account.
 
 ### Setup (one time)
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com).
-2. Create a new project (or select an existing one).
-3. Enable the **Google Drive API**.
-4. Go to **APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID**.
-   - Application type: **Web application**
-   - Authorized JavaScript origins: add your production domain (e.g. `https://flowerst.com`) AND `http://localhost:3000` for local dev.
-5. Copy the **Client ID** and paste it into `settings.js` → `googleClientId`.
-6. Share the target Drive folder with the visitors (or keep it private — users will auth with their own Google account to upload into your folder via the Drive API scope `drive.file`, which only allows access to files the app itself creates).
+1. Go to your Drive folder and click **Share**.
+2. Under "General access", set it to **"Anyone with the link"** and choose **"Contributor"** (or **"Editor"**) so visitors can upload files.
+3. Copy the folder ID from the URL (the long string after `/folders/`) and paste it into `src/settings.js` → `uploadFolderId`. The iframe and the open-link will update automatically.
 
-> **Note:** `drive.file` scope means visitors can only write to your folder, not read anything else in your Drive.
+> The folder ID is already pre-filled with the test folder. Replace it with your own folder's ID before going live.
 
 ---
 
@@ -122,19 +116,13 @@ The `src/` folder is a self-contained static site. Deploy it to any static host:
 - **Netlify / Vercel** — set the publish directory to `src/`.
 - **Any web server** — upload the contents of `src/` to the document root.
 
-Make sure `settings.js` is served from the **parent directory** of `src/` (i.e. one level up), since `index.html` loads it as `../settings.js`.
-
-Alternatively, move `settings.js` inside `src/` and update the `<script>` tag path in `index.html`.
+`settings.js` lives inside `src/` alongside `index.html`, so no special path configuration is needed.
 
 ---
 
 ## Adding a logo
 
-Drop your logo image into `img/logo.png` (or any format), then in `src/index.html` replace the `.nav-logo-text` span with:
-
-```html
-<img src="../img/logo.png" alt="Flower St" class="nav-logo-img">
-```
+Drop your logo file into `src/img/` (e.g. `src/img/logo.jpeg`). The navbar already references `img/logo.jpeg` and falls back to the store name text if the file is missing.
 
 ---
 
