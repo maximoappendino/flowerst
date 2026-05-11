@@ -14,9 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <!-- Google Identity Services (for Drive upload) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
   <!-- JSON-LD Structured Data — updated automatically by fetch-catalog.js -->
   <script id="structured-data" type="application/ld+json">
 {
@@ -78,8 +75,8 @@
     </div>
 
     <div class="nav-section nav-right">
-      <a href="#about"  class="nav-link">Nosotros</a>
-      <a href="#upload" class="nav-link">Subir archivos</a>
+      <a href="#about" class="nav-link">Nosotros</a>
+      <button class="nav-link upload-toggle" id="upload-toggle" aria-label="Subir archivos">Subir archivos</button>
       <button class="cart-toggle" id="cart-toggle" aria-label="Abrir carrito">
         <!-- Cart icon -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -102,7 +99,7 @@
     <a href="#home"    class="nav-link">Inicio</a>
     <a href="#catalog" class="nav-link">Catálogo</a>
     <a href="#about"   class="nav-link">Nosotros</a>
-    <a href="#upload"  class="nav-link">Subir archivos</a>
+    <button class="nav-link upload-toggle" aria-label="Subir archivos">Subir archivos</button>
     <button class="cart-toggle" aria-label="Abrir carrito">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="2">
@@ -170,94 +167,6 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════════════════════
-       ABOUT SECTION
-  ══════════════════════════════════════════════════════════════════════ -->
-  <section class="about-section" id="about" aria-label="Quiénes somos">
-    <div class="about-inner">
-
-      <div class="about-image-wrap">
-        <!-- If SETTINGS.aboutImage is set, main.js replaces this with an <img> -->
-        <div class="about-image-content">🌸</div>
-      </div>
-
-      <div class="about-text-wrap">
-        <h2 class="section-title about-title">Quiénes somos</h2>
-        <div class="section-divider"></div>
-        <p class="about-body">
-          Flower St nació de la pasión por el diseño y la impresión de calidad.
-          Somos una imprenta boutique que trabaja codo a codo con cada cliente para
-          transformar sus ideas en productos tangibles y memorables.
-        </p>
-        <a href="#contact" class="btn btn-outline">Contactanos</a>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════════════
-       UPLOAD SECTION
-  ══════════════════════════════════════════════════════════════════════ -->
-  <section class="upload-section" id="upload" aria-label="Subir archivos">
-    <div class="upload-inner">
-
-      <h2 class="section-title">Subir archivos</h2>
-      <div class="section-divider"></div>
-      <p class="section-subtitle">
-        Subí tus archivos de diseño directamente a nuestra carpeta de Google Drive.<br>
-        Nos pondremos en contacto por WhatsApp para coordinar los detalles.
-      </p>
-
-      <!-- The <label> wrapping the drop-zone ensures clicking anywhere in it
-           opens the OS file picker reliably across all browsers. -->
-      <label class="upload-area" id="upload-area" for="file-input">
-
-        <div class="upload-area-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-        </div>
-
-        <p class="upload-hint">Hacé clic aquí o arrastrá archivos para seleccionarlos</p>
-
-        <!-- Hidden input — triggered by the <label> above -->
-        <input type="file" id="file-input" multiple
-               style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-               tabindex="-1">
-
-        <!-- File list and upload button sit inside the label but stop click propagation
-             via JS so they don't re-open the picker -->
-        <div class="upload-file-list" id="upload-file-list"
-             onclick="event.preventDefault()"></div>
-
-        <div class="upload-progress-bar">
-          <div class="upload-progress-fill" id="upload-progress-fill"></div>
-        </div>
-
-        <button class="btn btn-primary" id="upload-btn" style="margin-top:1.2rem"
-                onclick="event.preventDefault()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="16 16 12 12 8 16"/>
-            <line x1="12" y1="12" x2="12" y2="21"/>
-            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-          </svg>
-          Subir a Google Drive
-        </button>
-
-        <p class="upload-auth-note">
-          Se solicitará autorización de Google la primera vez.
-        </p>
-
-        <p class="upload-status" aria-live="polite"></p>
-
-      </label><!-- .upload-area -->
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════════════════════════
        FOOTER
   ══════════════════════════════════════════════════════════════════════ -->
   <footer class="footer" id="contact">
@@ -272,7 +181,6 @@
         <a href="#home">Inicio</a>
         <a href="#catalog">Catálogo</a>
         <a href="#about">Nosotros</a>
-        <a href="#upload">Subir archivos</a>
       </nav>
 
       <div class="footer-contact">
@@ -284,6 +192,67 @@
       &copy; <span id="footer-year"></span> Flower St. Todos los derechos reservados.
     </div>
   </footer>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       UPLOAD MODAL
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="upload-overlay" id="upload-overlay" role="presentation"></div>
+
+  <div class="upload-modal" id="upload-modal"
+       role="dialog" aria-modal="true" aria-label="Subir archivos" aria-hidden="true">
+
+    <div class="upload-modal-header">
+      <h3>Subir archivos</h3>
+      <button class="upload-modal-close" id="upload-modal-close" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="upload-modal-body">
+
+      <label class="upload-area" id="upload-area" for="file-input">
+        <div class="upload-area-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p class="upload-hint">Arrastrá tus archivos acá, o hacé clic para elegirlos</p>
+        <input type="file" id="file-input" multiple accept="image/*,.pdf">
+      </label>
+
+      <div class="upload-file-list" id="upload-file-list"></div>
+
+      <div class="upload-progress-bar" id="upload-progress-bar">
+        <div class="upload-progress-fill" id="upload-progress-fill"></div>
+      </div>
+
+      <p class="upload-status" id="upload-status"></p>
+
+      <button class="btn btn-primary" id="upload-btn" style="margin-top:1.2rem">
+        Subir archivos
+      </button>
+
+      <!-- CLIENT AUTHORIZATION — TEMPORARY. Remove this <div> after Drive is connected. -->
+      <div id="client-auth-section"
+           style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--rose-100)">
+        <p class="upload-auth-note">
+          <strong>Solo para la dueña del local:</strong> conectá tu Google Drive una sola vez.
+          Después avisale al desarrollador para eliminar este botón.
+        </p>
+        <button class="btn" id="btn-authorize-drive"
+                style="margin-top:0.8rem;background:#4285f4;color:#fff;border-color:#4285f4">
+          Conectar Google Drive
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
        CART SIDEBAR
@@ -367,7 +336,88 @@
 </script>
 
   <!-- Scripts -->
-  <script src="settings.js"></script>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SETTINGS — edit these values to customise the store.
+  ══════════════════════════════════════════════════════════════════════ -->
+  <script>
+  const SETTINGS = {
+    // ── Store ───────────────────────────────────────────────────────────────
+    storeName:    "Flower St",
+    storeEmail:   "contacto@flowerst.com",
+    storeTagline: "Impresiones con estilo, hechas para vos.",
+
+    // ── WhatsApp ─────────────────────────────────────────────────────────────
+    // Country code + number, no spaces or dashes. e.g. "+541112345678"
+    whatsappPhone:    "+5493516763173",
+    whatsappGreeting: "Hola! Me gustaría hacer un pedido desde su sitio web.",
+
+    // ── Google Sheets catalog ─────────────────────────────────────────────────
+    // The spreadsheet must be publicly accessible ("Anyone with the link can view").
+    spreadsheetId: "1dVZQ9njepNWxefuMsPj8OvrsFuDiq5ea8rxg-TP71F0",
+
+    // ── Google Drive upload ───────────────────────────────────────────────────
+    // Folder ID where customer files will land in the client's Drive.
+    uploadFolderId: "1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o",
+
+    // Google Cloud OAuth 2.0 Client ID.
+    // Used only by the temporary "Conectar Google Drive" button.
+    // Create at: console.cloud.google.com → APIs & Services → Credentials
+    // Authorized redirect URIs must include:
+    //   https://YOUR-SITE.netlify.app/.netlify/functions/auth-callback
+    googleClientId: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+
+    // ── Hero Carousel ─────────────────────────────────────────────────────────
+    // Each slide: { image, title, subtitle }  — leave image "" for CSS gradient.
+    carouselSlides: [
+      {
+        image:    "",
+        title:    "Bienvenidos a Flower St",
+        subtitle: "Diseños únicos, impresiones de calidad",
+      },
+      {
+        image:    "",
+        title:    "Tu diseño, nuestro papel",
+        subtitle: "Explorá nuestro catálogo completo",
+      },
+      {
+        image:    "",
+        title:    "Subí tu archivo y listo",
+        subtitle: "Nosotros nos encargamos del resto",
+      },
+    ],
+
+    // ── Info / Phrases section ────────────────────────────────────────────────
+    infoBlocks: [
+      {
+        icon:  "🌸",
+        title: "Calidad garantizada",
+        text:  "Cada producto pasa por un riguroso control antes de salir de nuestras manos.",
+      },
+      {
+        icon:  "🚀",
+        title: "Entrega rápida",
+        text:  "Producimos y enviamos en tiempo récord para que nunca esperes de más.",
+      },
+      {
+        icon:  "💬",
+        title: "Atención personalizada",
+        text:  "Hablá con nosotros por WhatsApp y te asesoramos en cada paso.",
+      },
+    ],
+
+    // ── About section ─────────────────────────────────────────────────────────
+    aboutTitle: "Quiénes somos",
+    aboutText:
+      "Flower St nació de la pasión por el diseño y la impresión de calidad. " +
+      "Somos una imprenta boutique que trabaja codo a codo con cada cliente para " +
+      "transformar sus ideas en productos tangibles y memorables. " +
+      "Desde tarjetas y flyers hasta packaging personalizado, " +
+      "cada trabajo es único y lleva nuestra firma.",
+    aboutImage: "", // optional path to an about photo
+  };
+  </script>
+
   <script src="js/catalog.js"></script>
   <script src="js/main.js"></script>
 

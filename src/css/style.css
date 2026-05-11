@@ -768,6 +768,7 @@ ul  { list-style: none; }
 }
 
 .upload-area {
+  display: block;
   margin-top: 2rem;
   border: 2px dashed var(--rose-300);
   border-radius: var(--radius-lg);
@@ -871,6 +872,88 @@ ul  { list-style: none; }
   color: var(--text-light);
   margin-top: 0.8rem;
 }
+
+/* ─── Upload Modal ────────────────────────────────────────────────────────── */
+
+/* Make the navbar "Subir archivos" button look identical to the nav links */
+.navbar .upload-toggle,
+.mobile-menu .upload-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.upload-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(45,31,40,0.45);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+.upload-overlay.open { opacity: 1; pointer-events: all; }
+
+.upload-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -48%) scale(0.97);
+  z-index: 1201;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  width: min(92vw, 540px);
+  max-height: 88vh;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.upload-modal.open {
+  opacity: 1;
+  pointer-events: all;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.upload-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--rose-100);
+}
+.upload-modal-header h3 { margin: 0; font-size: 1.05rem; }
+
+.upload-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  padding: 4px;
+  display: flex;
+  transition: color var(--transition);
+}
+.upload-modal-close:hover { color: var(--dark); }
+
+.upload-modal-body {
+  padding: 1.4rem;
+  text-align: center;
+}
+
+/* Compact the drop zone inside the modal */
+.upload-modal-body .upload-area {
+  margin-top: 0;
+  padding: 1.8rem 1.2rem;
+  background: var(--rose-50);
+}
+
+.upload-modal-body .upload-area-icon        { margin-bottom: 0.6rem; }
+.upload-modal-body .upload-area-icon svg    { width: 36px; height: 36px; }
+.upload-modal-body .upload-hint             { margin-bottom: 0; font-size: 0.85rem; }
 
 /* ─── Cart Sidebar ────────────────────────────────────────────────────────── */
 .cart-overlay {

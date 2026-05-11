@@ -20,16 +20,20 @@
 const fs = require("fs");
 const path = require("path");
 
-// ── Load settings ──────────────────────────────────────────────────────────
-// Tiny inline require that avoids a module system mismatch with the browser
-// settings.js (which assigns to a global). We read it as text and eval.
-// Settings lives in src/ so it loads correctly from index.html when served from src/
-const settingsPath = path.resolve(__dirname, "../src/settings.js");
-const settingsCode = fs.readFileSync(settingsPath, "utf8");
-// Provide a mock global so the file can assign to `const SETTINGS`
+// ── Load settings from index.html ─────────────────────────────────────────
+// SETTINGS is now an inline <script> block inside src/index.html.
+// We extract the object literal with a regex and evaluate it so we can read
+// spreadsheetId, storeName, and storeEmail without importing browser globals.
+const INDEX_HTML_PATH = path.resolve(__dirname, "../src/index.html");
+const indexSource = fs.readFileSync(INDEX_HTML_PATH, "utf8");
+const settingsMatch = indexSource.match(/const SETTINGS\s*=\s*(\{[\s\S]*?\n\s*\});/);
+if (!settingsMatch) {
+  console.error("❌  Could not find SETTINGS object in src/index.html");
+  process.exit(1);
+}
 let SETTINGS;
 {
-  const capture = new Function("return (" + settingsCode.replace(/^const SETTINGS =/, "").replace(/;?\s*$/, "") + ")");
+  const capture = new Function(`return ${settingsMatch[1]}`);
   SETTINGS = capture();
 }
 
@@ -40,7 +44,7 @@ if (!SHEET_ID) {
 }
 
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
-const INDEX_HTML = path.resolve(__dirname, "../src/index.html");
+const INDEX_HTML = INDEX_HTML_PATH; // alias used throughout this file
 const STORE_NAME = SETTINGS.storeName || "Flower St";
 const STORE_EMAIL = SETTINGS.storeEmail || "";
 

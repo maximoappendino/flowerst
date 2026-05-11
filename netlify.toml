@@ -1,0 +1,13 @@
+# Netlify configuration for Flower St
+#
+# publish     — the static site lives in src/
+# functions   — serverless functions live in netlify/functions/
+
+[build]
+  publish   = "src"
+  functions = "netlify/functions"
+
+# Allow the upload function to receive binary files without Netlify
+# automatically decoding the body (Node handles the base64 decoding itself).
+[functions]
+  node_bundler = "esbuild"

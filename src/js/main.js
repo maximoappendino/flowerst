@@ -4,21 +4,16 @@
  * main.js
  *
  * Handles:
- *  - Settings injection (from SETTINGS global in settings.js)
+ *  - Settings injection (from inline SETTINGS object in index.html)
  *  - Navbar (scroll behavior, mobile menu)
  *  - Hero carousel
  *  - Cart (localStorage, add/remove/qty, sidebar)
  *  - WhatsApp button (with cart summary)
- *  - File upload to Google Drive (OAuth 2.0 via GIS)
+ *  - Customer file upload → /.netlify/functions/upload
+ *  - Client authorization button (temporary — remove after Drive is connected)
  */
 
 (function () {
-  /* ── Abort if settings.js not loaded ──────────────────────────────────── */
-  if (typeof SETTINGS === "undefined") {
-    console.error("[FlowerSt] settings.js not loaded.");
-    return;
-  }
-
   const S = SETTINGS;
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
@@ -410,20 +405,43 @@
     });
   }
 
-  /* ── Google Drive file upload ─────────────────────────────────────────── */
+  /* ── Upload modal ────────────────────────────────────────────────────── */
 
-  let gisClient = null;
-  let accessToken = null;
+  function openUploadModal() {
+    qs("#upload-modal")?.classList.add("open");
+    qs("#upload-overlay")?.classList.add("open");
+    qs("#upload-modal")?.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeUploadModal() {
+    qs("#upload-modal")?.classList.remove("open");
+    qs("#upload-overlay")?.classList.remove("open");
+    qs("#upload-modal")?.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function initUploadModal() {
+    qsa(".upload-toggle").forEach((btn) => btn.addEventListener("click", openUploadModal));
+    qs("#upload-modal-close")?.addEventListener("click", closeUploadModal);
+    qs("#upload-overlay")?.addEventListener("click", closeUploadModal);
+  }
+
+  /* ── Customer file upload (via Netlify function) ─────────────────────── */
+  // Files are sent raw (one at a time) to /.netlify/functions/upload.
+  // The function holds the shopowner's Google credentials and uploads to Drive,
+  // so customers never need a Google account.
+
   let pendingFiles = [];
 
-  function initUpload() {
-    const area     = qs(".upload-area");
-    const input    = qs("#file-input");
-    const fileList = qs(".upload-file-list");
-    const uploadBtn = qs("#upload-btn");
-    const progressBar  = qs(".upload-progress-fill");
-    const progressWrap = qs(".upload-progress-bar");
-    const statusEl = qs(".upload-status");
+  function initCustomerUpload() {
+    const area       = qs("#upload-area");
+    const input      = qs("#file-input");
+    const fileList   = qs("#upload-file-list");
+    const uploadBtn  = qs("#upload-btn");
+    const progressBar  = qs("#upload-progress-bar");
+    const progressFill = qs("#upload-progress-fill");
+    const statusEl   = qs("#upload-status");
 
     if (!area) return;
 
@@ -465,8 +483,7 @@
       });
     }
 
-    // The <label for="file-input"> in the HTML handles opening the picker.
-    // We only need to listen for the change event here.
+    // The <label for="file-input"> opens the picker; we only need the change event.
     input.addEventListener("change", () => {
       pendingFiles = [...pendingFiles, ...Array.from(input.files)];
       input.value = "";
@@ -483,105 +500,107 @@
       renderFileList();
     });
 
-    // Upload button — starts Drive upload (files must already be selected)
-    if (uploadBtn) {
-      uploadBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        e.preventDefault(); // prevent label from re-opening picker
+    if (!uploadBtn) return;
 
-        if (!pendingFiles.length) {
-          setStatus("Primero seleccioná archivos haciendo clic en el área de arriba.", "error");
-          return;
-        }
+    uploadBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // prevent label from re-opening picker
 
-        const clientId = S.googleClientId;
-        if (!clientId || clientId.includes("YOUR_GOOGLE_CLIENT_ID")) {
-          // Fallback: open the Drive folder so the user can upload manually
-          setStatus("⚠️ Carga automática no configurada. Abriendo carpeta de Drive…", "error");
-          setTimeout(() => window.open(`https://drive.google.com/drive/folders/${S.uploadFolderId}`, "_blank"), 1200);
-          return;
-        }
-
-        setStatus("Autenticando con Google…");
-        uploadBtn.disabled = true;
-
-        try {
-          accessToken = await getGoogleToken(clientId);
-        } catch {
-          setStatus("❌ Autenticación cancelada o fallida.", "error");
-          uploadBtn.disabled = false;
-          return;
-        }
-
-        const total = pendingFiles.length;
-        let done = 0;
-
-        if (progressWrap) progressWrap.style.display = "block";
-
-        for (const file of pendingFiles) {
-          setStatus(`Subiendo ${file.name}…`);
-          try {
-            await uploadFileToDrive(file, S.uploadFolderId, accessToken);
-            done++;
-            if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
-          } catch (err) {
-            console.error("[upload]", err);
-            setStatus(`❌ Error al subir ${file.name}: ${err.message}`, "error");
-            uploadBtn.disabled = false;
-            return;
-          }
-        }
-
-        pendingFiles = [];
-        renderFileList();
-        setStatus(`✅ ${total} archivo${total > 1 ? "s" : ""} subido${total > 1 ? "s" : ""} correctamente!`, "success");
-        uploadBtn.disabled = false;
-        if (progressBar) setTimeout(() => { progressBar.style.width = "0%"; if (progressWrap) progressWrap.style.display = "none"; }, 2000);
-      });
-    }
-  }
-
-  function getGoogleToken(clientId) {
-    return new Promise((resolve, reject) => {
-      if (accessToken) return resolve(accessToken);
-
-      if (typeof google === "undefined" || !google.accounts) {
-        reject(new Error("Google Identity Services not loaded"));
+      if (!pendingFiles.length) {
+        setStatus("Primero seleccioná archivos haciendo clic en el área de arriba.", "error");
         return;
       }
 
-      const client = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: "https://www.googleapis.com/auth/drive.file",
-        callback: (resp) => {
-          if (resp.error) { reject(new Error(resp.error)); return; }
-          accessToken = resp.access_token;
-          resolve(accessToken);
-        },
-      });
+      // Netlify functions have a ~6 MB body limit; warn early to avoid silent failures.
+      const tooBig = pendingFiles.find((f) => f.size > 5 * 1024 * 1024);
+      if (tooBig) {
+        setStatus(`"${tooBig.name}" supera los 5 MB. Comprimí el archivo o contactanos por WhatsApp.`, "error");
+        return;
+      }
 
-      client.requestAccessToken({ prompt: "consent" });
+      uploadBtn.disabled = true;
+      if (progressBar) progressBar.style.display = "block";
+
+      const total = pendingFiles.length;
+      let done = 0;
+
+      for (const file of [...pendingFiles]) {
+        setStatus(`Subiendo ${file.name}…`);
+        try {
+          await uploadFileToNetlify(file);
+          done++;
+          if (progressFill) progressFill.style.width = `${(done / total) * 100}%`;
+        } catch (err) {
+          console.error("[upload]", err);
+          setStatus(`❌ Error al subir "${file.name}": ${err.message}`, "error");
+          uploadBtn.disabled = false;
+          return;
+        }
+      }
+
+      pendingFiles = [];
+      renderFileList();
+      setStatus(`✅ ${total} archivo${total > 1 ? "s" : ""} enviado${total > 1 ? "s" : ""} correctamente.`, "success");
+      uploadBtn.disabled = false;
+      setTimeout(() => {
+        if (progressFill) progressFill.style.width = "0%";
+        if (progressBar) progressBar.style.display = "none";
+      }, 2000);
     });
   }
 
-  async function uploadFileToDrive(file, folderId, token) {
-    const metadata = { name: file.name, parents: folderId ? [folderId] : [] };
-
-    const form = new FormData();
-    form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
-    form.append("file", file);
-
-    const res = await fetch(
-      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name",
-      { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form }
-    );
+  // Send one file as a raw POST body to the Netlify upload function.
+  // The function exchanges the shopowner's refresh token for an access token
+  // and uploads the file to their Google Drive folder.
+  async function uploadFileToNetlify(file) {
+    const res = await fetch("/.netlify/functions/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type":  file.type || "application/octet-stream",
+        "X-File-Name":   encodeURIComponent(file.name),
+        "X-Folder-Id":   encodeURIComponent(S.uploadFolderId || ""),
+      },
+      body: file,
+    });
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}`);
     }
 
     return res.json();
+  }
+
+  /* ── Client authorization button (TEMPORARY — remove after Drive is connected) ── */
+  // When the shopowner clicks this button she is redirected to Google's OAuth
+  // consent screen. After she approves, the auth-callback Netlify function
+  // exchanges the code for a refresh token and shows it on screen.
+  // That refresh token goes into Netlify env vars as GOOGLE_REFRESH_TOKEN.
+
+  function initClientAuth() {
+    const btn = qs("#btn-authorize-drive");
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+      const clientId = S.googleClientId;
+      if (!clientId || clientId.includes("YOUR_GOOGLE_CLIENT_ID")) {
+        alert("Primero configurá googleClientId en las settings de index.html.");
+        return;
+      }
+
+      // access_type=offline + prompt=consent guarantee we receive a refresh token.
+      const redirectUri = `${location.origin}/.netlify/functions/auth-callback`;
+      const params = new URLSearchParams({
+        client_id:     clientId,
+        redirect_uri:  redirectUri,
+        response_type: "code",
+        scope:         "https://www.googleapis.com/auth/drive.file",
+        access_type:   "offline",
+        prompt:        "consent",
+      });
+
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+    });
   }
 
   /* ── Boot ─────────────────────────────────────────────────────────────── */
@@ -592,7 +611,9 @@
     initCarousel();
     initCart();
     initWhatsApp();
-    initUpload();
+    initUploadModal();
+    initCustomerUpload();
+    initClientAuth();
   }
 
   if (document.readyState === "loading") {
