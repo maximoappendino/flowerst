@@ -11,6 +11,7 @@ flowerst/
 ├── src/
 │   ├── index.html          ← main page + all SETTINGS live here
 │   ├── css/style.css
+│   ├── img/                ← local images (logo, about photo, etc.)
 │   └── js/
 │       ├── catalog.js      ← product rendering & lazy-loading
 │       └── main.js         ← carousel, cart, WhatsApp, file upload

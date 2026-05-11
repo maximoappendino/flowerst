@@ -56,19 +56,21 @@
 </head>
 <body>
 
+  <div class="grain" aria-hidden="true"></div>
+
   <!-- ══════════════════════════════════════════════════════════════════════
        NAVBAR
   ══════════════════════════════════════════════════════════════════════ -->
   <nav class="navbar at-top" id="navbar" role="navigation" aria-label="Navegación principal">
 
     <div class="nav-section nav-left">
-      <a href="#home"   class="nav-link">Inicio</a>
-      <a href="#catalog" class="nav-link">Catálogo</a>
+      <a href="#home"    class="nav-link">Inicio</a>
+      <a href="filosofia.html" class="nav-link">Filosofía</a>
     </div>
 
     <div class="nav-section nav-center">
       <a href="#home" class="nav-logo-wrap" aria-label="Flower St — inicio">
-        <img src="../img/logo.jpeg" alt="Flower St" class="nav-logo-img"
+        <img src="img/logo.jpeg" alt="Flower St" class="nav-logo-img"
              onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
         <span class="nav-logo-text" style="display:none">Flower St</span>
       </a>
@@ -78,7 +80,6 @@
       <a href="#about" class="nav-link">Nosotros</a>
       <button class="nav-link upload-toggle" id="upload-toggle" aria-label="Subir archivos">Subir archivos</button>
       <button class="cart-toggle" id="cart-toggle" aria-label="Abrir carrito">
-        <!-- Cart icon -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -297,6 +298,49 @@
     </div>
 
   </aside>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       UPLOAD MODAL
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="upload-overlay" aria-hidden="true"></div>
+
+  <div class="upload-modal" id="upload-modal" role="dialog"
+       aria-label="Subir archivos" aria-hidden="true">
+
+    <div class="modal-header">
+      <h3>Subir archivos</h3>
+      <button class="modal-close" id="upload-modal-close" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <p class="modal-subtitle">
+      Explorá nuestra carpeta de Drive y subí tus archivos de diseño directamente desde tu cuenta de Google.
+    </p>
+
+    <iframe
+      src="https://drive.google.com/embeddedfolderview?id=1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o#list"
+      class="drive-embed"
+      title="Carpeta de archivos Flower St"
+      allowfullscreen>
+    </iframe>
+
+    <a href="https://drive.google.com/drive/folders/1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o?usp=sharing"
+       target="_blank" rel="noopener"
+       class="btn btn-primary drive-open-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      Abrir en Google Drive
+    </a>
+
+  </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
        WHATSAPP FLOATING BUTTON

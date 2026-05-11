@@ -28,12 +28,6 @@
     return "$ " + n.toLocaleString("es-AR");
   }
 
-  function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  }
-
   /* ── Apply settings to page ──────────────────────────────────────────── */
 
   function applySettings() {
@@ -443,44 +437,17 @@
     const progressFill = qs("#upload-progress-fill");
     const statusEl   = qs("#upload-status");
 
-    if (!area) return;
-
-    function setStatus(msg, type = "") {
-      if (!statusEl) return;
-      statusEl.textContent = msg;
-      statusEl.className = "upload-status" + (type ? ` ${type}` : "");
+    function open() {
+      qs(".modal-overlay")?.classList.add("open");
+      qs(".upload-modal")?.classList.add("open");
+      document.body.style.overflow = "hidden";
     }
 
-    function renderFileList() {
-      if (!fileList) return;
-      if (!pendingFiles.length) { fileList.innerHTML = ""; return; }
-      fileList.innerHTML = pendingFiles
-        .map(
-          (f, i) => `
-          <div class="upload-file-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
-              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-              <polyline points="13 2 13 9 20 9"/>
-            </svg>
-            <span class="upload-file-name">${f.name}</span>
-            <span class="upload-file-size">${formatBytes(f.size)}</span>
-            <button class="upload-remove-btn" data-index="${i}" aria-label="Quitar">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 6 6 18M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>`
-        )
-        .join("");
-
-      fileList.querySelectorAll(".upload-remove-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          pendingFiles.splice(Number(btn.dataset.index), 1);
-          renderFileList();
-        });
-      });
+    function close() {
+      qs(".modal-overlay")?.classList.remove("open");
+      qs(".upload-modal")?.classList.remove("open");
+      document.body.style.overflow = "";
+      qs(".mobile-menu")?.classList.remove("open");
     }
 
     // The <label for="file-input"> opens the picker; we only need the change event.
