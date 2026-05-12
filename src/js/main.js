@@ -442,11 +442,11 @@
       if (!pendingFiles.length) { fileList.innerHTML = ""; return; }
       fileList.innerHTML = pendingFiles
         .map((f, i) => `<div class="upload-file-item">
-          <span>${f.name}</span>
-          <button type="button" data-idx="${i}" class="upload-file-remove" aria-label="Eliminar">✕</button>
+          <span class="upload-file-name">${f.name}</span>
+          <button type="button" data-idx="${i}" class="upload-remove-btn" aria-label="Eliminar">✕</button>
         </div>`)
         .join("");
-      fileList.querySelectorAll(".upload-file-remove").forEach((btn) => {
+      fileList.querySelectorAll(".upload-remove-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           pendingFiles.splice(Number(btn.dataset.idx), 1);
           renderFileList();
@@ -457,7 +457,7 @@
     function setStatus(msg, type = "") {
       if (!statusEl) return;
       statusEl.textContent = msg;
-      statusEl.className = "upload-status" + (type ? ` upload-status-${type}` : "");
+      statusEl.className = "upload-status" + (type ? ` ${type}` : "");
     }
 
     // The <label for="file-input"> opens the picker; we only need the change event.
