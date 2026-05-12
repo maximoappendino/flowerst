@@ -437,17 +437,27 @@
     const progressFill = qs("#upload-progress-fill");
     const statusEl   = qs("#upload-status");
 
-    function open() {
-      qs(".modal-overlay")?.classList.add("open");
-      qs(".upload-modal")?.classList.add("open");
-      document.body.style.overflow = "hidden";
+    function renderFileList() {
+      if (!fileList) return;
+      if (!pendingFiles.length) { fileList.innerHTML = ""; return; }
+      fileList.innerHTML = pendingFiles
+        .map((f, i) => `<div class="upload-file-item">
+          <span>${f.name}</span>
+          <button type="button" data-idx="${i}" class="upload-file-remove" aria-label="Eliminar">✕</button>
+        </div>`)
+        .join("");
+      fileList.querySelectorAll(".upload-file-remove").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          pendingFiles.splice(Number(btn.dataset.idx), 1);
+          renderFileList();
+        });
+      });
     }
 
-    function close() {
-      qs(".modal-overlay")?.classList.remove("open");
-      qs(".upload-modal")?.classList.remove("open");
-      document.body.style.overflow = "";
-      qs(".mobile-menu")?.classList.remove("open");
+    function setStatus(msg, type = "") {
+      if (!statusEl) return;
+      statusEl.textContent = msg;
+      statusEl.className = "upload-status" + (type ? ` upload-status-${type}` : "");
     }
 
     // The <label for="file-input"> opens the picker; we only need the change event.
