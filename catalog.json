@@ -1,0 +1,102 @@
+{
+  "updated": "2026-05-14T22:33:11.616Z",
+  "products": [
+    {
+      "id": "2",
+      "title": "title 2",
+      "price": 1000,
+      "categories": [
+        "crema",
+        "verdura"
+      ],
+      "description": "breve descripcion del producto",
+      "variations": [
+        "chico",
+        "grande"
+      ],
+      "variationPrices": [
+        12315,
+        3222
+      ],
+      "images": []
+    },
+    {
+      "id": "a",
+      "title": "title a",
+      "price": 1000000,
+      "categories": [
+        "verdura",
+        "mueble"
+      ],
+      "description": "breve descripcion del producto",
+      "variations": [
+        "color rojo",
+        "color verde"
+      ],
+      "variationPrices": [
+        10,
+        20
+      ],
+      "images": []
+    },
+    {
+      "id": "b",
+      "title": "title b",
+      "price": 123124211,
+      "categories": [
+        "terreno",
+        "crema",
+        "mueble"
+      ],
+      "description": "breve descripcion del producto",
+      "variations": [
+        "color rojo",
+        "color verde"
+      ],
+      "variationPrices": [
+        10,
+        20
+      ],
+      "images": []
+    },
+    {
+      "id": "1a",
+      "title": "title 1a",
+      "price": 123512304.2,
+      "categories": [
+        "terreno",
+        "crema",
+        "mueble"
+      ],
+      "description": "breve descripcion del producto",
+      "variations": [
+        "color rojo",
+        "color verde"
+      ],
+      "variationPrices": [
+        10,
+        20
+      ],
+      "images": []
+    },
+    {
+      "id": "2b",
+      "title": "title 2b",
+      "price": 1235342.56,
+      "categories": [
+        "y que pasa si va sin espacios",
+        "o es muy largo"
+      ],
+      "description": "breve descripcion del producto",
+      "variations": [
+        "color rojo",
+        "color verde"
+      ],
+      "variationPrices": [
+        10,
+        20
+      ],
+      "images": []
+    }
+  ]
+}

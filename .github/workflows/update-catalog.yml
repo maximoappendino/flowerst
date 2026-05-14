@@ -1,0 +1,32 @@
+name: Update Catalog
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # every hour
+  workflow_dispatch:        # allow manual runs from the GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build catalog
+        run: node scripts/build-catalog.js
+        env:
+          DRIVE_API_KEY: ${{ secrets.DRIVE_API_KEY }}
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add catalog.json index.html
+          git diff --staged --quiet && echo "Nothing to commit." || (git commit -m "chore: update catalog [skip ci]" && git push)
