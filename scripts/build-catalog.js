@@ -125,8 +125,16 @@ function injectSEO(products) {
     return;
   }
 
+  const siteConfig = {
+    storeName: settings.storeName,
+    whatsappNumber: settings.whatsappNumber,
+    currency: settings.currency,
+    queueFolderUrl: settings.queueFolderUrl,
+  };
+
   const block = [
     '<!-- CATALOG_DATA_START -->',
+    `<script>window.__SITE__=${JSON.stringify(siteConfig)};</script>`,
     `<script type="application/json" id="catalog-data">${JSON.stringify({ products })}</script>`,
     `<script type="application/ld+json">${JSON.stringify(buildJsonLd(products))}</script>`,
     '<!-- CATALOG_DATA_END -->',
