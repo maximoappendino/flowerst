@@ -1,0 +1,6 @@
+# Claude Code local settings (may contain approved shell commands with secrets)
+.claude/settings.local.json
+.claude/
+
+# Local env file — store DRIVE_API_KEY here for local builds
+.env
