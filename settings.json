@@ -4,5 +4,6 @@
   "imageFolderId": "1x75f6LCeY5hPs_A8g4TVlyR8n4GMxqfQ",
   "queueFolderUrl": "https://drive.google.com/drive/folders/1-VcN-RfnFKbAgGn7CnPR3miqHpChGY-o",
   "whatsappNumber": "5493516763173",
-  "currency": "ARS"
+  "currency": "ARS",
+  "skipHeaderRow": false
 }

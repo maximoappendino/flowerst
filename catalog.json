@@ -1,6 +1,26 @@
 {
-  "updated": "2026-05-14T23:41:27.169Z",
+  "updated": "2026-05-15T02:24:15.398Z",
   "products": [
+    {
+      "id": "1",
+      "title": "title 1",
+      "price": 100,
+      "categories": [
+        "crema"
+      ],
+      "description": "breve descripcion del producto",
+      "variations": [
+        "color rojo",
+        "color verde"
+      ],
+      "variationPrices": [
+        10,
+        20
+      ],
+      "images": [
+        "https://drive.google.com/uc?export=view&id=1Yd473JByCXoNQRil7z6HOQA2--re-Zob"
+      ]
+    },
     {
       "id": "2",
       "title": "title 2",

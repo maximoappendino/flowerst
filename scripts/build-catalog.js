@@ -39,7 +39,7 @@ function parseCSVLine(line) {
 
 function parseCSV(text) {
   const lines = text.replace(/\r/g, '').trim().split('\n');
-  return lines.slice(1).map(line => {
+  return lines.slice(settings.skipHeaderRow ? 1 : 0).map(line => {
     const c = parseCSVLine(line);
     return {
       id:              c[0]?.trim() || '',
