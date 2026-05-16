@@ -143,7 +143,7 @@ function productCardHTML(p) {
 
   const tagsHTML = p.categories.map(c => `<span class="card-tag">${escHtml(c)}</span>`).join('');
   const varsHTML = p.variations.length
-    ? `<p class="card-vars">${p.variations.map(escHtml).join(' · ')}</p>`
+    ? `<p class="card-vars">${p.variations.map(v => escHtml(v.name)).join(' · ')}</p>`
     : '';
 
   return `
@@ -188,9 +188,8 @@ function closeModal() {
 }
 
 function updateModalPrice() {
-  const price = (currentVarIdx >= 0 && currentProduct.variationPrices[currentVarIdx])
-    ? currentProduct.variationPrices[currentVarIdx]
-    : currentProduct.price;
+  const variation = currentVarIdx >= 0 ? currentProduct.variations[currentVarIdx] : null;
+  const price = (variation && variation.price > 0) ? variation.price : currentProduct.price;
   document.getElementById('modal-price').textContent = `$${fmt(price)}`;
 }
 
@@ -234,9 +233,8 @@ function renderModalVariations() {
     <p class="variations-label">Variaciones</p>
     <div class="variation-buttons">
       ${currentProduct.variations.map((v, i) => {
-        const p = currentProduct.variationPrices[i];
-        const sub = p ? ` — $${fmt(p)}` : '';
-        return `<button class="variation-btn" data-i="${i}">${escHtml(v)}${sub}</button>`;
+        const sub = v.price > 0 ? ` — $${fmt(v.price)}` : '';
+        return `<button class="variation-btn" data-i="${i}">${escHtml(v.name)}${sub}</button>`;
       }).join('')}
     </div>`;
 
@@ -259,12 +257,10 @@ function renderModalVariations() {
 // ── Cart ──────────────────────────────────────────────────────────────────────
 
 function addToCart() {
-  const price = (currentVarIdx >= 0 && currentProduct.variationPrices[currentVarIdx])
-    ? currentProduct.variationPrices[currentVarIdx]
-    : currentProduct.price;
-
-  const variation = currentVarIdx >= 0 ? currentProduct.variations[currentVarIdx] : null;
-  const key       = `${currentProduct.id}||${variation ?? ''}`;
+  const variationObj  = currentVarIdx >= 0 ? currentProduct.variations[currentVarIdx] : null;
+  const price         = (variationObj && variationObj.price > 0) ? variationObj.price : currentProduct.price;
+  const variation     = variationObj?.name ?? null;
+  const key           = `${currentProduct.id}||${variation ?? ''}`;
   const existing  = cart.find(i => i.key === key);
 
   if (existing) {
@@ -369,8 +365,6 @@ function closeCartPanel() {
 // ── Events ────────────────────────────────────────────────────────────────────
 
 function bindEvents() {
-  document.getElementById('btn-reload').addEventListener('click', () => location.reload());
-
   document.getElementById('btn-upload').addEventListener('click', () => {
     window.open(SITE.queueFolderUrl, '_blank', 'noopener');
   });

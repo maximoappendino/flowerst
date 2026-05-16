@@ -1,122 +1,40 @@
 {
-  "updated": "2026-05-15T02:24:15.398Z",
+  "updated": "2026-05-16T17:52:54.443Z",
   "products": [
     {
-      "id": "1",
-      "title": "title 1",
-      "price": 100,
+      "id": "corona-floral",
+      "title": "Corona Floral",
+      "description": "Corona decorativa hecha a mano con flores naturales, perfecta para eventos y celebraciones.",
+      "price": 15000,
       "categories": [
-        "crema"
+        "coronas",
+        "decoración"
       ],
-      "description": "breve descripcion del producto",
-      "variations": [
-        "color rojo",
-        "color verde"
-      ],
-      "variationPrices": [
-        10,
-        20
-      ],
-      "images": [
-        "https://drive.google.com/uc?export=view&id=1Yd473JByCXoNQRil7z6HOQA2--re-Zob"
-      ]
-    },
-    {
-      "id": "2",
-      "title": "title 2",
-      "price": 1000,
-      "categories": [
-        "crema",
-        "verdura"
-      ],
-      "description": "breve descripcion del producto",
-      "variations": [
-        "chico",
-        "grande"
-      ],
-      "variationPrices": [
-        12315,
-        3222
-      ],
-      "images": [
-        "https://drive.google.com/uc?export=view&id=1BHFA5iziTfm4I7Rf_QWBanm77yhbppV0"
-      ]
-    },
-    {
-      "id": "a",
-      "title": "title a",
-      "price": 1000000,
-      "categories": [
-        "verdura",
-        "mueble"
-      ],
-      "description": "breve descripcion del producto",
-      "variations": [
-        "color rojo",
-        "color verde"
-      ],
-      "variationPrices": [
-        10,
-        20
-      ],
+      "variations": [],
       "images": []
     },
     {
-      "id": "b",
-      "title": "title b",
-      "price": 123124211,
+      "id": "ramo-clasico",
+      "title": "Ramo Clásico",
+      "description": "Hermoso ramo con flores de temporada, ideal para regalar en cualquier ocasión.",
+      "price": 8000,
       "categories": [
-        "terreno",
-        "crema",
-        "mueble"
+        "ramos",
+        "flores"
       ],
-      "description": "breve descripcion del producto",
       "variations": [
-        "color rojo",
-        "color verde"
-      ],
-      "variationPrices": [
-        10,
-        20
-      ],
-      "images": []
-    },
-    {
-      "id": "1a",
-      "title": "title 1a",
-      "price": 123512304.2,
-      "categories": [
-        "terreno",
-        "crema",
-        "mueble"
-      ],
-      "description": "breve descripcion del producto",
-      "variations": [
-        "color rojo",
-        "color verde"
-      ],
-      "variationPrices": [
-        10,
-        20
-      ],
-      "images": []
-    },
-    {
-      "id": "2b",
-      "title": "title 2b",
-      "price": 1235342.56,
-      "categories": [
-        "y que pasa si va sin espacios",
-        "o es muy largo"
-      ],
-      "description": "breve descripcion del producto",
-      "variations": [
-        "color rojo",
-        "color verde"
-      ],
-      "variationPrices": [
-        10,
-        20
+        {
+          "name": "Chico",
+          "price": 8000
+        },
+        {
+          "name": "Mediano",
+          "price": 12000
+        },
+        {
+          "name": "Grande",
+          "price": 18000
+        }
       ],
       "images": []
     }
