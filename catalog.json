@@ -1,21 +1,21 @@
 {
-  "updated": "2026-05-15T02:24:15.398Z",
+  "updated": "2026-05-16T17:05:43.262Z",
   "products": [
     {
       "id": "1",
-      "title": "title 1",
-      "price": 100,
+      "title": "Libretas",
+      "price": 0,
       "categories": [
         "crema"
       ],
-      "description": "breve descripcion del producto",
+      "description": "10x7, 13x9",
       "variations": [
-        "color rojo",
-        "color verde"
+        "10x7",
+        "13x9"
       ],
       "variationPrices": [
-        10,
-        20
+        6000,
+        10000
       ],
       "images": [
         "https://drive.google.com/uc?export=view&id=1Yd473JByCXoNQRil7z6HOQA2--re-Zob"
@@ -23,20 +23,18 @@
     },
     {
       "id": "2",
-      "title": "title 2",
-      "price": 1000,
+      "title": "Anotadores",
+      "price": 2500,
       "categories": [
         "crema",
         "verdura"
       ],
-      "description": "breve descripcion del producto",
+      "description": "Combo dos anotadores, 7cm x 7cm",
       "variations": [
-        "chico",
-        "grande"
+        "7x7"
       ],
       "variationPrices": [
-        12315,
-        3222
+        2500
       ],
       "images": [
         "https://drive.google.com/uc?export=view&id=1BHFA5iziTfm4I7Rf_QWBanm77yhbppV0"
