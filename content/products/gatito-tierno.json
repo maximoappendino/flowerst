@@ -1,0 +1,17 @@
+{
+  "variations": [
+    {
+      "name": "10x7",
+      "price": 5000000
+    }
+  ],
+  "images": [
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0BAkzBXAX7Re3GkIjBW76nFOVwxHSWjqAiA&s"
+  ],
+  "title": "gatito tierno",
+  "description": "descricion xd",
+  "price": 99,
+  "categories": [
+    "cats"
+  ]
+}
